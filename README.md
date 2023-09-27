@@ -209,7 +209,7 @@
 	
 	
 }
-    ```
+    
     실질적인 로직처를 하는 Dao
     ```
     public class BoardDaoImpl implements BoardDao {
