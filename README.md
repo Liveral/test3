@@ -31,18 +31,20 @@
 
 ![메인페이지_지역별관광지.png](README%204ad9456f389843ad81d58f4ddc44157a/%25EB%25A9%2594%25EC%259D%25B8%25ED%258E%2598%25EC%259D%25B4%25EC%25A7%2580_%25EC%25A7%2580%25EC%2597%25AD%25EB%25B3%2584%25EA%25B4%2580%25EA%25B4%2591%25EC%25A7%2580.png)
 
-### 1.1.3 정보 게시판바 Slide down
+### 1.1.3 테마바 Slide down
+
+![메인페이지_테마.png](README%204ad9456f389843ad81d58f4ddc44157a/%25EB%25A9%2594%25EC%259D%25B8%25ED%258E%2598%25EC%259D%25B4%25EC%25A7%2580_%25ED%2585%258C%25EB%25A7%2588.png)
+
+### 1.1.4 정보 게시판바 Slide down
 
 ![메인페이지_게시판.png](README%204ad9456f389843ad81d58f4ddc44157a/%25EB%25A9%2594%25EC%259D%25B8%25ED%258E%2598%25EC%259D%25B4%25EC%25A7%2580_%25EA%25B2%258C%25EC%258B%259C%25ED%258C%2590.png)
 
 ## 1.2 💻 메인 화면 code
 
-<details>
-  <summary></summary>
-```java
+- <details>
   public class AttractionDaoImpl implements AttractionDao {
     
- 
+    ```
     static private AttractionDao attractionDao = new AttractionDaoImpl();
         static private DBUtil dbUtil = DBUtil.getInstance();
     
@@ -146,10 +148,9 @@
     
     }
     ```
-</details>
+  </details>
     
     
-  
     
 
 # ✅ 2. 로그인 기능
@@ -166,121 +167,191 @@
 
 ## 2.2. 💻 code
 
-- 코드 펼치기
-    
-    public class MemberDaoImpl implements MemberDao {
-    
+-<details>
+<summary>코드 펼치기</summary>
+
+  Memeber DB에 접근하기 위한 Dto
     ```
-    static private MemberDao memberDao = new MemberDaoImpl();
-        static private DBUtil dbUtil = DBUtil.getInstance();
-    
-        private MemberDaoImpl() {}
-    
-        public static MemberDao getMemberDao() {
-            return memberDao;
-        }
-    
-        @Override
-        public int registerMember(MemberDto memberDto) throws SQLException {
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-    
-            String sql = "insert into member (user_name, user_id, user_pass, join_date)\r\n" +
-                    "values (?, ?, ?, sysdate());";
-    
-            try {
-                        conn = dbUtil.getConnection();
-    
-                        pstmt = conn.prepareStatement(sql);
-                        pstmt.setString(1, memberDto.getUserName() );
-                        pstmt.setString(2, memberDto.getUserId() );
-                        pstmt.setString(3, memberDto.getUserPass() );
-    
-                        return pstmt.executeUpdate();
-                    } finally {
-                        dbUtil.close(pstmt, conn);
-                    }
-        }
-    
-        @Override
-        public MemberDto login(String userIdInput, String userPassInput) throws SQLException {
-            MemberDto memberDto = null;
-    
-            String sql = "select *\r\n" +
-                    "from member\r\n" +
-                    "where user_id=? and user_pass=?;";
-    
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-            ResultSet rs = null;
-            try {
-                conn = dbUtil.getConnection();
-    
-                            pstmt = conn.prepareStatement(sql);
-                            pstmt.setString(1, userIdInput);
-                            pstmt.setString(2, userPassInput);
-    
-                            rs = pstmt.executeQuery();
-    
-                            if (rs.next()) {
-                                String userName = rs.getString("user_name");
-                                String userId = rs.getString("user_id");
-                                String userPass = rs.getString("user_pass");
-                                String joinDate = rs.getString("join_date");
-    
-                                memberDto = new MemberDto(userName, userId, userPass, joinDate);
-                            }
-                    } finally {
-                        dbUtil.close(rs, pstmt, conn);
-            }
-    
-            return memberDto;
-        }
-    
-        @Override
-        public int modifyMember(MemberDto memberDto) throws SQLException {
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-    
-                    String sql = "update member\r\n" +
-                        "set user_name=?, user_pass=?\r\n" +
-                        "where user_id=?;";
-    
-                    try {
-                        conn = dbUtil.getConnection();
-    
-                        pstmt = conn.prepareStatement(sql);
-                        pstmt.setString(1, memberDto.getUserName());
-                        pstmt.setString(2, memberDto.getUserPass());
-                        pstmt.setString(3, memberDto.getUserId() );
-    
-                        return pstmt.executeUpdate();
-                    } finally {
-                        dbUtil.close(pstmt, conn);
-                    }
-        }
-    
-        @Override
-        public int deleteMember(String userId) throws SQLException {
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-    
-                    String sql = "delete from member\n" +
-                            "where user_id = ?;";
-    
-                    try {
-                        conn = dbUtil.getConnection();
-    
-                        pstmt = conn.prepareStatement(sql);
-                        pstmt.setString(1, userId);
-                        return pstmt.executeUpdate();
-                    } finally {
-                        dbUtil.close(pstmt, conn);
-                    }
-        }
-    
-    }
+    public class MemberDto {
+	private String userId;
+	private String userName;
+	private String userPassword;
+	
+	
+	public MemberDto() {
+		super();
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getUserPassword() {
+		return userPassword;
+	}
+	public void setUserPassword(String userPassword) {
+		this.userPassword = userPassword;
+	}
+	@Override
+	public String toString() {
+		return "MemberDto [userId=" + userId + ", user_name=" + userName + ", userPassword=" + userPassword + "]";
+	}
+	
+	
+}
     ```
+    실질적인 로직처를 하는 Dao
+    ```
+    public class BoardDaoImpl implements BoardDao {
+	private DBUtil dbUtil=DBUtil.getInstance();
+	
+	@Override
+	public List<BoardDto> selectAll() throws SQLException {
+		List<BoardDto> list=new ArrayList<>();
+		String sql="select * from board;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		ResultSet rs=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			rs=pstmt.executeQuery();
+			
+			while(rs.next()) {
+				BoardDto boardDto=new BoardDto();
+				boardDto.setArticleNo(rs.getInt("article_no"));
+				boardDto.setUserId(rs.getString("user_id"));
+				boardDto.setSubject(rs.getString("subject"));
+				boardDto.setContent(rs.getString("content"));
+				boardDto.setRegisterTime(rs.getString("register_time"));
+				
+				list.add(boardDto);
+			}
+			
+			return list;
+		} finally {
+			dbUtil.close(conn,pstmt,rs);
+		}
+		
+	}
+
+	@Override
+	public BoardDto selectByArticleNo(int articleNo) throws SQLException {
+		BoardDto boardDto=new BoardDto();
+		String sql="select * from board where article_no=?;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		ResultSet rs=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setInt(1, articleNo);
+			rs=pstmt.executeQuery();
+			
+			if(rs.next()) {
+				boardDto.setArticleNo(rs.getInt("article_no"));
+				boardDto.setUserId(rs.getString("user_id"));
+				boardDto.setSubject(rs.getString("subject"));
+				boardDto.setContent(rs.getString("content"));
+				boardDto.setRegisterTime(rs.getString("register_time"));
+				
+				return boardDto;
+			}
+			
+			return null;
+		} finally {
+			dbUtil.close(conn,pstmt,rs);
+		}
+	}
+
+	@Override
+	public void deleteByArticleNo(int articleNo) throws SQLException {
+		
+		String sql="delete from board where article_no=?;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setInt(1, articleNo);
+			
+			int cnt= pstmt.executeUpdate();
+			
+			
+		} finally {
+			dbUtil.close(conn,pstmt);
+		}
+		
+	}
+
+	@Override
+	public void regist(BoardDto boardDto) throws SQLException {
+		String sql="insert into board (user_id, subject, content)\r\n" + 
+				"value(?, ?, ?);";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setString(1, boardDto.getUserId());
+			pstmt.setString(2, boardDto.getSubject() );
+			pstmt.setString(3, boardDto.getContent());
+			
+			int cnt= pstmt.executeUpdate();
+			
+			
+		} finally {
+			dbUtil.close(conn,pstmt);
+		}
+	}
+
+	@Override
+	public void modify(BoardDto boardDto) throws SQLException {
+		String sql="update board\r\n" + 
+				"set subject=?, content=?\r\n" + 
+				"where user_id=?;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setString(1, boardDto.getSubject());
+			pstmt.setString(2, boardDto.getContent());
+			pstmt.setString(3, boardDto.getUserId());
+			
+			int cnt= pstmt.executeUpdate();
+			
+			
+		} finally {
+			dbUtil.close(conn,pstmt);
+		}
+		
+		
+	}
+
+	
+
+}
+    ```
+    </details>
     
 
 # ✅ 3. 게시판 관리
@@ -505,6 +576,22 @@
     }
     ```
     
+
+# ✅ 4. 지역별 관광지 찾기
+
+### 👀 4.1. 실행화면
+
+### 4.1.1 지역별 관광지 검색
+
+![attraction.gif](README%204ad9456f389843ad81d58f4ddc44157a/attraction.gif)
+
+### 4.1.2 지역별 관광지 검색(지도 활용)
+
+![attraction2.gif](README%204ad9456f389843ad81d58f4ddc44157a/attraction2.gif)
+
+## 4.2.  code
+
+- 코드 펼치기
 
 ## Class Diagram
 
