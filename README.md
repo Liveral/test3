@@ -170,7 +170,7 @@
 <details>
 <summary>코드 펼치기</summary>
 
-  Memeber DB에 접근하기 위한 Dto  
+  Memeber DB에 접근하기 위한 DTO  
 ---
     
     public class MemberDto {
@@ -205,9 +205,10 @@
 		return "MemberDto [userId=" + userId + ", user_name=" + userName + ", userPassword=" + userPassword + "]";
 	}
     
----    
+    ---
+    #dfdff
     
-    실질적인 로직처를 하는 Dao
+실질적인 로직처를 하는 Dao
     
     public class BoardDaoImpl implements BoardDao {
 	private DBUtil dbUtil=DBUtil.getInstance();
