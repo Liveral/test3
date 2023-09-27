@@ -171,7 +171,8 @@
 <summary>코드 펼치기</summary>
 
   Memeber DB에 접근하기 위한 Dto
-    ```java
+  
+    ```
 
     
     public class MemberDto {
