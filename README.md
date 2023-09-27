@@ -206,12 +206,11 @@
 	public String toString() {
 		return "MemberDto [userId=" + userId + ", user_name=" + userName + ", userPassword=" + userPassword + "]";
 	}
-	
-	
-}
     
     실질적인 로직처를 하는 Dao
+    
     ```
+    
     public class BoardDaoImpl implements BoardDao {
 	private DBUtil dbUtil=DBUtil.getInstance();
 	
@@ -344,15 +343,9 @@
 			
 		} finally {
 			dbUtil.close(conn,pstmt);
-		}
-		
-		
+		}	
 	}
-
-	
-
 }
-    ```
     </details>
     
 
