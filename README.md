@@ -37,9 +37,9 @@
 
 ## 1.2 💻 메인 화면 code
 
-- 코드 펼치기
-    
-    public class AttractionDaoImpl implements AttractionDao {
+<details>
+  <summary>첫번째토글</summary>
+  public class AttractionDaoImpl implements AttractionDao {
     
     ```
     static private AttractionDao attractionDao = new AttractionDaoImpl();
@@ -144,7 +144,10 @@
         }
     
     }
-    ```
+</details>
+    
+    
+  
     
 
 # ✅ 2. 로그인 기능
