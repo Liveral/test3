@@ -170,9 +170,9 @@
 <details>
 <summary>코드 펼치기</summary>
 
-  Memeber DB에 접근하기 위한 DTO  
+  Memeber DB대신 사용되는 DTO 객체
 ---
-    
+    ```
     public class MemberDto {
 	private String userId;
 	private String userName;
@@ -204,11 +204,12 @@
 	public String toString() {
 		return "MemberDto [userId=" + userId + ", user_name=" + userName + ", userPassword=" + userPassword + "]";
 	}
-    
+    ```
    
    
    실질적인 로직처리를 하는 DAO
    ---
+   ```
     public class BoardDaoImpl implements BoardDao {
 	private DBUtil dbUtil=DBUtil.getInstance();
 	
@@ -344,9 +345,11 @@
 		}	
 	}
 }
+```
 
 Controller의 요청을 DAO으로 전달하는 Service
 ---
+```
 public class MemberServiceImpl implements MemberService {
 	private MemberDao memberDao=new MemberDaoImpl();
 	@Override
@@ -358,9 +361,11 @@ public class MemberServiceImpl implements MemberService {
 		memberDao.join(memberDto);
 		
 	}
+```
 
 요청 처리 제어를 담당하는 Controller
 ---
+```
 @WebServlet("/member")
 public class MemberController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -487,6 +492,172 @@ public class MemberController extends HttpServlet {
 	}
 
 }
+```
+회원가입 화면 JSP
+---
+```
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="icon" href="./assets/images/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <!-- Latest compiled and minified CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+
+    <!-- Latest compiled JavaScript -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <link
+      href="
+https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css
+"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <link rel="stylesheet" href="./assets/css/signin.css">
+    <script defer src="./assets/js/main.js"></script>
+</head>
+<body>
+
+
+    <!-- 헤더 -->
+
+    <%@ include file="/include/header.jsp" %>
+      <!-- 상단 navbar end -->
+
+    <section class="signin">
+        <h1>회원 가입</h1>
+        <div class="signin__card">
+          <h2>
+            <strong>Welcome!</strong> 회원가입을 시작합니다.
+          </h2>
+          <form action="${pageContext.request.contextPath}/member?action=join" method="POST">
+          	<input type="text" placeholder="사용자 이름을 입력하세요." name="userName"/>
+            <input type="text" placeholder="아이디를 입력하세요." name="userId"/>
+            <input type="password" placeholder="비밀번호를 입력하세요." name="userPassword"/>
+            <input type="submit" value="회원가입" />
+            <p>
+              * 비밀번호는 6자리 이상으로 설정해주세요!
+            </p>
+          </form>
+          <div class="actions">
+            <a href="${pageContext.request.contextPath}/member?action=mvlogin">로그인</a>
+            <a href="javascript:void(0)">아이디 찾기</a>
+            <a href="javascript:void(0)">비밀번호 찾기</a>
+          </div>
+        </div>
+      </section>
+
+      <%@ include file="/include/footer.jsp" %>
+</body>
+</html>
+```
+로그인 화면 JSP
+```
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="icon" href="./assets/images/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <!-- Latest compiled and minified CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+
+    <!-- Latest compiled JavaScript -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <link
+      href="
+https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css
+"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <link rel="stylesheet" href="./assets/css/signin.css">
+    <script defer src="./assets/js/main.js"></script>
+</head>
+<body>
+
+
+    <!-- 헤더 -->
+
+    <%@ include file="/include/header.jsp" %>
+      <!-- 상단 navbar end -->
+
+    <section class="signin">
+        <h1>Login</h1>
+        <div class="signin__card">
+          <h2>
+            <strong>Welcome!</strong> Enjoy Trip에 오신 것을 환영합니다.
+          </h2>
+          <form action="${pageContext.request.contextPath}/member?action=login" method="POST">
+            <input type="text" placeholder="아이디를 입력하세요." name="userId"/>
+            <input type="password" placeholder="비밀번호를 입력하세요." name="userPassword"/>
+            <input type="submit" value="로그인" />
+            <p>
+              * 비밀번호를 타 사이트와 같이 사용할 경우 도용 위험이 있으니, <br />
+              정기적으로 비밀번호를 변경하세요!
+            </p>
+          </form>
+          <div class="actions">
+            <a href="${pageContext.request.contextPath}/member?action=mvjoin">회원가입</a>
+            <a href="javascript:void(0)">아이디 찾기</a>
+            <a href="javascript:void(0)">비밀번호 찾기</a>
+          </div>
+        </div>
+      </section>
+
+      <%@ include file="/include/footer.jsp" %>
+</body>
+</html>
+```
 </details>
     
 
@@ -518,199 +689,82 @@ public class MemberController extends HttpServlet {
 
 ## 3.2.  code
 
-- 코드 펼치기
-    
-    public class BoardDaoImpl implements BoardDao {
-    
-    ```
-    private static BoardDao boardDao = new BoardDaoImpl();
-        private static DBUtil dbUtil = DBUtil.getInstance();
-    
-        private BoardDaoImpl() {}
-    
-        public static BoardDao getBoardDao() {
-            return boardDao;
-        }
-    
-        @Override
-        public int registerArticle(BoardDto boardDto) throws SQLException {
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-    
-            String sql = "insert into board (user_id, subject, content, register_time)\n" +
-                    "values (?, ?, ?, sysdate());";
-    
-            try {
-                conn = dbUtil.getConnection();
-    
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, boardDto.getUserId() );
-                pstmt.setString(2, boardDto.getSubject() );
-                pstmt.setString(3, boardDto.getContent() );
-    
-                return pstmt.executeUpdate();
-            } finally {
-                dbUtil.close(pstmt, conn);
-            }
-        }
-    
-        @Override
-        public List<BoardDto> searchListAll() throws SQLException {
-            List<BoardDto> list = new ArrayList<BoardDto>();
-    
-            String sql = "select *\n" +
-                    "from board\n" +
-                    "order by article_no;";
-    
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-            ResultSet rs = null;
-            try {
-                conn = dbUtil.getConnection();
-    
-                pstmt = conn.prepareStatement(sql);
-                rs = pstmt.executeQuery();
-    
-                while(rs.next()) {
-                    int articleNo = rs.getInt("article_no");
-                    String userId = rs.getString("user_id");
-                    String subject = rs.getString("subject");
-                    String content = rs.getString("content");
-                    int hit = rs.getInt("hit");
-                    String registerTime = rs.getString("register_time");
-    
-                    BoardDto boardDto = new BoardDto(articleNo, userId, subject, content, hit, registerTime);
-                    list.add(boardDto);
-                }
-            } finally {
-                dbUtil.close(rs, pstmt, conn);
-            }
-    
-            return list;
-        }
-    
-        @Override
-        public List<BoardDto> searchListBySubject(String subjectName) throws SQLException {
-            List<BoardDto> list = new ArrayList<BoardDto>();
-    
-            String sql = "select *\n" +
-                    "from board\n" +
-                    "where subject like ?;";
-    
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-            ResultSet rs = null;
-            try {
-                conn = dbUtil.getConnection();
-    
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, "%"+subjectName+"%");
-                rs = pstmt.executeQuery();
-    
-                while(rs.next()) {
-                    int articleNo = rs.getInt("article_no");
-                    String userId = rs.getString("user_id");
-                    String subject = rs.getString("subject");
-                    String content = rs.getString("content");
-                    int hit = rs.getInt("hit");
-                    String registerTime = rs.getString("register_time");
-    
-                    BoardDto boardDto = new BoardDto(articleNo, userId, subject, content, hit, registerTime);
-                    list.add(boardDto);
-                }
-            } finally {
-                dbUtil.close(rs, pstmt, conn);
-            }
-    
-            return list;
-        }
-    
-        @Override
-        public BoardDto viewArticle(int no) throws SQLException {
-            BoardDto boardDto = null;
-    
-            String selectSql = "select *\n" +
-                    "from board\n" +
-                    "where article_no = ?;";
-            String hitCountSql = "update board\r\n" +
-                    "set hit=?\r\n" +
-                    "where article_no=?;";  // 조회수 1 증가시키는 쿼리
-    
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-            ResultSet rs = null;
-            try {
-                conn = dbUtil.getConnection();
-    
-                pstmt = conn.prepareStatement(selectSql);
-                pstmt.setInt(1, no);
-                rs = pstmt.executeQuery();
-    
-                while(rs.next()) {
-                    int articleNo = rs.getInt("article_no");
-                    String subject = rs.getString("subject");
-                    String content = rs.getString("content");
-                    String userId = rs.getString("user_id");
-                    int hit = rs.getInt("hit");
-                    String registerTime = rs.getString("register_time");
-    
-                    boardDto = new BoardDto(articleNo, subject, content, userId, hit, registerTime);
-    
-                    // 조회수 증가
-                    pstmt = conn.prepareStatement(hitCountSql);
-                    pstmt.setInt(1,  hit+1);
-                    pstmt.setInt(2, articleNo);
-                    pstmt.executeUpdate();
-                }
-            } finally {
-                dbUtil.close(rs, pstmt, conn);
-            }
-    
-            return boardDto;
-        }
-    
-        @Override
-        public int modifyArticle(BoardDto boardDto) throws SQLException {
-            String sql = "update board\n" +
-                    "set subject=?, content=?\n" +
-                    "where article_no=?;";
-    
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-            ResultSet rs = null;
-            try {
-                conn = dbUtil.getConnection();
-    
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, boardDto.getSubject());
-                pstmt.setString(2, boardDto.getContent());
-                pstmt.setInt(3, boardDto.getArticleNo());
-                return pstmt.executeUpdate();
-            } finally {
-                dbUtil.close(rs, pstmt, conn);
-            }
-        }
-    
-        @Override
-        public int deleteArticle(int no) throws SQLException {
-            String sql = "delete from board\n" +
-                    "where article_no=?;";
-    
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-            ResultSet rs = null;
-            try {
-                conn = dbUtil.getConnection();
-    
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, no);
-                return pstmt.executeUpdate();
-            } finally {
-                dbUtil.close(rs, pstmt, conn);
-            }
-        }
-    }
-    ```
+<details>
+<summary>코드 펼치기</summary>
+Board DB대신 사용되는 DTO 객체
+---
+```
+	public class BoardDto {
+	private int articleNo;
+	private String userId;
+	private String subject;
+	private String content;
+	private String registerTime;
+	
+	
+	public BoardDto() {
+	}
+
+
+	public int getArticleNo() {
+		return articleNo;
+	}
+
+
+	public void setArticleNo(int articleNo) {
+		this.articleNo = articleNo;
+	}
+
+
+	public String getUserId() {
+		return userId;
+	}
+
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+
+	public String getSubject() {
+		return subject;
+	}
+
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+
+	public String getContent() {
+		return content;
+	}
+
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+
+	public String getRegisterTime() {
+		return registerTime;
+	}
+
+
+	public void setRegisterTime(String registerTime) {
+		this.registerTime = registerTime;
+	}
+
+
+	@Override
+	public String toString() {
+		return "BoardDto [articleNo=" + articleNo + ", userId=" + userId + ", subject=" + subject + ", content="
+				+ content + ", registerTime=" + registerTime + "]";
+	}	
+}
+```
+	
+</details>
     
 
 # ✅ 4. 지역별 관광지 찾기
