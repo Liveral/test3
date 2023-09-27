@@ -38,10 +38,11 @@
 ## 1.2 💻 메인 화면 code
 
 <details>
-  <summary>첫번째토글</summary>
+  <summary></summary>
+```java
   public class AttractionDaoImpl implements AttractionDao {
     
-    ```
+ 
     static private AttractionDao attractionDao = new AttractionDaoImpl();
         static private DBUtil dbUtil = DBUtil.getInstance();
     
@@ -144,6 +145,7 @@
         }
     
     }
+    ```
 </details>
     
     
