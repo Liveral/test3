@@ -172,7 +172,7 @@
 
   Memeber DB에 접근하기 위한 Dto
   
-    ```
+    ```java
 
     
     public class MemberDto {
@@ -206,10 +206,11 @@
 	public String toString() {
 		return "MemberDto [userId=" + userId + ", user_name=" + userName + ", userPassword=" + userPassword + "]";
 	}
+    ```
     
     실질적인 로직처를 하는 Dao
     
-    ```
+    ```java
     
     public class BoardDaoImpl implements BoardDao {
 	private DBUtil dbUtil=DBUtil.getInstance();
@@ -346,6 +347,8 @@
 		}	
 	}
 }
+```
+
     </details>
     
 
