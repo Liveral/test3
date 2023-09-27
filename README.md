@@ -170,10 +170,8 @@
 <details>
 <summary>코드 펼치기</summary>
 
-  Memeber DB에 접근하기 위한 Dto
-  
-    ```java
-
+  Memeber DB에 접근하기 위한 Dto  
+---
     
     public class MemberDto {
 	private String userId;
@@ -206,11 +204,10 @@
 	public String toString() {
 		return "MemberDto [userId=" + userId + ", user_name=" + userName + ", userPassword=" + userPassword + "]";
 	}
-    ```
+    
+---    
     
     실질적인 로직처를 하는 Dao
-    
-    ```java
     
     public class BoardDaoImpl implements BoardDao {
 	private DBUtil dbUtil=DBUtil.getInstance();
@@ -347,7 +344,6 @@
 		}	
 	}
 }
-```
 
     </details>
     
