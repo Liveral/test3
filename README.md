@@ -691,6 +691,7 @@ https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css
 
 <details>
 <summary>코드 펼치기</summary>
+
 Board DB대신 사용되는 DTO 객체
 ---
 ```
@@ -763,7 +764,878 @@ Board DB대신 사용되는 DTO 객체
 	}	
 }
 ```
+실질적인 로직 처리를 하는 DAO
+---
+```
+public class BoardDaoImpl implements BoardDao {
+	private DBUtil dbUtil=DBUtil.getInstance();
 	
+	@Override
+	public List<BoardDto> selectAll() throws SQLException {
+		List<BoardDto> list=new ArrayList<>();
+		String sql="select * from board;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		ResultSet rs=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			rs=pstmt.executeQuery();
+			
+			while(rs.next()) {
+				BoardDto boardDto=new BoardDto();
+				boardDto.setArticleNo(rs.getInt("article_no"));
+				boardDto.setUserId(rs.getString("user_id"));
+				boardDto.setSubject(rs.getString("subject"));
+				boardDto.setContent(rs.getString("content"));
+				boardDto.setRegisterTime(rs.getString("register_time"));
+				
+				list.add(boardDto);
+			}
+			
+			return list;
+		} finally {
+			dbUtil.close(conn,pstmt,rs);
+		}
+		
+	}
+
+	@Override
+	public BoardDto selectByArticleNo(int articleNo) throws SQLException {
+		BoardDto boardDto=new BoardDto();
+		String sql="select * from board where article_no=?;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		ResultSet rs=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setInt(1, articleNo);
+			rs=pstmt.executeQuery();
+			
+			if(rs.next()) {
+				boardDto.setArticleNo(rs.getInt("article_no"));
+				boardDto.setUserId(rs.getString("user_id"));
+				boardDto.setSubject(rs.getString("subject"));
+				boardDto.setContent(rs.getString("content"));
+				boardDto.setRegisterTime(rs.getString("register_time"));
+				
+				return boardDto;
+			}
+			
+			return null;
+		} finally {
+			dbUtil.close(conn,pstmt,rs);
+		}
+	}
+
+	@Override
+	public void deleteByArticleNo(int articleNo) throws SQLException {
+		
+		String sql="delete from board where article_no=?;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setInt(1, articleNo);
+			
+			int cnt= pstmt.executeUpdate();
+			
+			
+		} finally {
+			dbUtil.close(conn,pstmt);
+		}
+		
+	}
+
+	@Override
+	public void regist(BoardDto boardDto) throws SQLException {
+		String sql="insert into board (user_id, subject, content)\r\n" + 
+				"value(?, ?, ?);";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setString(1, boardDto.getUserId());
+			pstmt.setString(2, boardDto.getSubject() );
+			pstmt.setString(3, boardDto.getContent());
+			
+			int cnt= pstmt.executeUpdate();
+			
+			
+		} finally {
+			dbUtil.close(conn,pstmt);
+		}
+	}
+
+	@Override
+	public void modify(BoardDto boardDto) throws SQLException {
+		String sql="update board\r\n" + 
+				"set subject=?, content=?\r\n" + 
+				"where user_id=?;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setString(1, boardDto.getSubject());
+			pstmt.setString(2, boardDto.getContent());
+			pstmt.setString(3, boardDto.getUserId());
+			
+			int cnt= pstmt.executeUpdate();
+			
+			
+		} finally {
+			dbUtil.close(conn,pstmt);
+		}			
+	}
+}
+```
+
+Controller의 요청을 DAO로 전달하는 Service 
+---
+```
+public class BoardDaoImpl implements BoardDao {
+	private DBUtil dbUtil=DBUtil.getInstance();
+	
+	@Override
+	public List<BoardDto> selectAll() throws SQLException {
+		List<BoardDto> list=new ArrayList<>();
+		String sql="select * from board;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		ResultSet rs=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			rs=pstmt.executeQuery();
+			
+			while(rs.next()) {
+				BoardDto boardDto=new BoardDto();
+				boardDto.setArticleNo(rs.getInt("article_no"));
+				boardDto.setUserId(rs.getString("user_id"));
+				boardDto.setSubject(rs.getString("subject"));
+				boardDto.setContent(rs.getString("content"));
+				boardDto.setRegisterTime(rs.getString("register_time"));
+				
+				list.add(boardDto);
+			}
+			
+			return list;
+		} finally {
+			dbUtil.close(conn,pstmt,rs);
+		}
+		
+	}
+
+	@Override
+	public BoardDto selectByArticleNo(int articleNo) throws SQLException {
+		BoardDto boardDto=new BoardDto();
+		String sql="select * from board where article_no=?;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		ResultSet rs=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setInt(1, articleNo);
+			rs=pstmt.executeQuery();
+			
+			if(rs.next()) {
+				boardDto.setArticleNo(rs.getInt("article_no"));
+				boardDto.setUserId(rs.getString("user_id"));
+				boardDto.setSubject(rs.getString("subject"));
+				boardDto.setContent(rs.getString("content"));
+				boardDto.setRegisterTime(rs.getString("register_time"));
+				
+				return boardDto;
+			}
+			
+			return null;
+		} finally {
+			dbUtil.close(conn,pstmt,rs);
+		}
+	}
+
+	@Override
+	public void deleteByArticleNo(int articleNo) throws SQLException {
+		
+		String sql="delete from board where article_no=?;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setInt(1, articleNo);
+			
+			int cnt= pstmt.executeUpdate();
+			
+			
+		} finally {
+			dbUtil.close(conn,pstmt);
+		}
+		
+	}
+
+	@Override
+	public void regist(BoardDto boardDto) throws SQLException {
+		String sql="insert into board (user_id, subject, content)\r\n" + 
+				"value(?, ?, ?);";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setString(1, boardDto.getUserId());
+			pstmt.setString(2, boardDto.getSubject() );
+			pstmt.setString(3, boardDto.getContent());
+			
+			int cnt= pstmt.executeUpdate();
+			
+			
+		} finally {
+			dbUtil.close(conn,pstmt);
+		}
+	}
+
+	@Override
+	public void modify(BoardDto boardDto) throws SQLException {
+		String sql="update board\r\n" + 
+				"set subject=?, content=?\r\n" + 
+				"where user_id=?;";
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=dbUtil.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setString(1, boardDto.getSubject());
+			pstmt.setString(2, boardDto.getContent());
+			pstmt.setString(3, boardDto.getUserId());
+			
+			int cnt= pstmt.executeUpdate();
+			
+			
+		} finally {
+			dbUtil.close(conn,pstmt);
+		}				
+	}
+}
+```
+요청 처리를 제어하는 Controller
+---
+```
+@WebServlet("/board")
+public class BoardController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	private BoardService boardService=new BoardServiceImpl();
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String action=request.getParameter("action");
+		
+		switch (action) {
+		case "list":
+			list(request,response);
+			break;
+		case "view":
+			view(request,response);
+			break;
+		case "delete":
+			delete(request,response);
+			break;
+		case "mvregist":
+			response.sendRedirect(request.getContextPath()+"/regist.jsp");
+			break;
+		case "regist":
+			regist(request,response);
+			break;
+		case "mvModify":
+			mvModify(request,response);
+			break;
+		case "modify":
+			modify(request,response);
+			break;
+		default:
+			break;
+		}
+		
+	}
+
+
+	private void mvModify(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("수정할 글 불러오기");
+		int articleNo=Integer.parseInt(request.getParameter("articleNo"));
+		
+		BoardDto article=new BoardDto();
+		try {
+			article = boardService.selectByArticleNo(articleNo);
+			if(article!=null) {
+				System.out.println("조회한 글 : "+article);
+				request.setAttribute("article", article);
+				request.getRequestDispatcher("/modify.jsp").forward(request, response);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	private void modify(HttpServletRequest request, HttpServletResponse response) {
+		System.out.println("글 수정 시작");
+		BoardDto boardDto=new BoardDto();
+		
+		String userId=request.getParameter("userId");
+		String subject=request.getParameter("subject");
+		String content=request.getParameter("content");
+		
+		boardDto.setUserId(userId);
+		boardDto.setSubject(subject);
+		boardDto.setContent(content);
+		
+		try {
+			boardService.modify(boardDto);
+			response.sendRedirect(request.getContextPath()+"/board?action=list");
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+
+
+	private void regist(HttpServletRequest request, HttpServletResponse response) {
+		System.out.println("글 작성 시작");
+		BoardDto boardDto=new BoardDto();
+		
+		String userId=request.getParameter("userId");
+		String subject=request.getParameter("subject");
+		String content=request.getParameter("content");
+		
+		boardDto.setUserId(userId);
+		boardDto.setSubject(subject);
+		boardDto.setContent(content);
+		
+		try {
+			boardService.regist(boardDto);
+			response.sendRedirect(request.getContextPath()+"/board?action=list");
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+
+
+	private void delete(HttpServletRequest request, HttpServletResponse response) {
+		System.out.println("삭제 시작");
+		int articleNo=Integer.parseInt(request.getParameter("articleNo"));
+		
+		try {
+			boardService.deleteByArticleNo(articleNo);
+			response.sendRedirect(request.getContextPath()+"/board?action=list");
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+	}
+
+
+	private void view(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("글 상세 조회 시작");
+		int articleNo=Integer.parseInt(request.getParameter("articleNo"));
+		
+		BoardDto article=new BoardDto();
+		try {
+			article = boardService.selectByArticleNo(articleNo);
+			if(article!=null) {
+				System.out.println("조회한 글 : "+article);
+				request.setAttribute("article", article);
+				request.getRequestDispatcher("/boardview.jsp").forward(request, response);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
+
+
+	private void list(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("게시판 글 목록 조회 시작");
+		try {
+			List<BoardDto> boardList=boardService.selectAll();
+			
+			for(BoardDto b : boardList) {
+				System.out.println("게시판 목록  = "+b);
+			}
+			request.setAttribute("boardList", boardList);
+			request.getRequestDispatcher("/board.jsp").forward(request, response);
+		} catch (SQLException e) {
+			System.out.println("게시판 글 목록 조회 실패");
+			e.printStackTrace();
+		}
+		
+	}
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");
+		doGet(request, response);
+	}
+
+}
+```
+게시판을 보여주는 board.jsp
+---
+```
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<link rel="icon" href="./assets/images/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+<!-- Latest compiled and minified CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+<!-- Latest compiled JavaScript -->
+<script defer
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<link
+	href="
+https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css
+"
+	rel="stylesheet" />
+<link rel="stylesheet" href="./assets/css/main.css" />
+<link rel="stylesheet" href="./assets/css/board.css">
+<script defer src="./assets/js/main.js"></script>
+</head>
+<body>
+
+
+	<!-- 헤더 -->
+
+	<%@ include file="/include/header.jsp"%>
+	<!-- 상단 navbar end -->
+
+	<section class="board">
+		<div class="page-title">
+			<div class="container">
+				<h3>게시판</h3><br>
+				<c:if test="${not empty sessionScope.memberInfo }">
+				<button type="button" class="btn btn-blue" onclick="location.href='${pageContext.request.contextPath}/board?action=mvregist'">글 쓰기</button>
+				</c:if>
+				
+			</div>
+		</div>
+		<div id="board-search">
+			<div class="container">
+				<div class="search-window">
+					<form action="">
+						<div class="search-wrap">
+							<label for="search" class="blind">공지사항 내용 검색</label> <input
+								id="search" type="search" name="" placeholder="검색어를 입력해주세요."
+								value="">	
+							<button type="submit" class="btn btn-dark">검색</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- board list area -->
+		<div id="board-list">
+			<div class="container">
+				<table class="board-table">
+					<thead>
+						<tr>
+							<th scope="col" class="th-num">번호</th>
+							<th scope="col" class="th-title">제목</th>
+							<th scope="col" class="th-date">등록일</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach items="${boardList}" var="item" varStatus="status">
+							<tr>
+								<td>${status.count}</td>
+								<th><a href="${pageContext.request.contextPath}/board?action=view&articleNo=${item.articleNo}">${item.subject}</a></th>
+								<td>${item.registerTime}</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</section>
+
+	<footer>
+		<div class="inner">
+			<ul class="menu">
+				<li><a href="">개인정보 처리방침</a></li>
+				<li><a href="">홈페이지 이용약관</a></li>
+				<li><a href="">위치정보 이용약관</a></li>
+			</ul>
+			<div class="btn-group">
+				<a href="" class="btn btn--gold">회사 소개</a> <a href=""
+					class="btn btn--gold">신규입점제의</a> <a href="" class="btn btn--gold">사이트
+					맵</a>
+			</div>
+		</div>
+	</footer>
+</body>
+</html>
+```
+
+글의 제목을 클릭했을때 나오는 상세보기 화면 boardview.jsp
+---
+```
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<link rel="icon" href="./assets/images/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+<!-- Latest compiled and minified CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+<!-- Latest compiled JavaScript -->
+<script defer
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<link
+	href="
+https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css
+"
+	rel="stylesheet" />
+<link rel="stylesheet" href="./assets/css/main.css" />
+<link rel="stylesheet" href="./assets/css/board.css">
+<script defer src="./assets/js/main.js"></script>
+</head>
+<body>
+
+
+	<!-- 헤더 -->
+
+	<%@ include file="/include/header.jsp"%>
+	<!-- 상단 navbar end -->
+
+	<section class="board">
+		<div class="page-title">
+			<div class="container">
+				<h3>게시판</h3>
+			</div>
+		</div>
+
+		<div id="board-search">
+			<div class="container">
+				<div class="col-lg-8 col-md-10 col-sm-12">
+					<div class="row my-2">
+						<h1 class="fs-3 fw-bold text-secondary px-5">${article.subject}</h1>
+					</div>
+					<div class="row">
+						<div class="col-md-8">
+							<div class="clearfix align-content-center">
+								<img class="avatar me-2 float-md-start bg-light p-2"
+									src="https://raw.githubusercontent.com/twbs/icons/main/icons/person-fill.svg" />
+								<p>
+									<span class="fw-bold">${article.userId}</span> <br /> <span
+										class="text-secondary fw-light">
+										${article.registerTime} </span>
+								</p>
+							</div>
+						</div>
+						<div class="col-md-4 align-self-center text-end"></div>
+						<div class="divider mb-3"></div>
+						<div class="text-secondary">${article.content}</div>
+						<div class="divider mt-3 mb-3"></div>
+						<div class="d-flex justify-content-end">
+							<button type="button" id="btn-list"
+								class="btn btn-outline-primary mb-3"
+								onclick="location.href='${pageContext.request.contextPath}/board?action=list'">
+								글목록</button>
+								<c:set var="memberId" value="${sessionScope.memberInfo.userId}"></c:set>
+								<c:set var="articleId" value="${article.userId}"></c:set>
+							<c:if test="${memberId == articleId}">
+								<button type="button" id="btn-mv-modify"
+									class="btn btn-outline-success mb-3 ms-1"
+									onclick="location.href='${pageContext.request.contextPath}/board?action=mvModify&articleNo=${article.articleNo }'"
+									>글수정</button>
+								<button type="button" id="btn-delete"
+									class="btn btn-outline-danger mb-3 ms-1 "
+									onclick="location.href='${pageContext.request.contextPath}/board?action=delete&articleNo=${article.articleNo }'">
+									글삭제</button>
+							</c:if>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</section>
+
+	<footer>
+		<div class="inner">
+			<ul class="menu">
+				<li><a href="">개인정보 처리방침</a></li>
+				<li><a href="">홈페이지 이용약관</a></li>
+				<li><a href="">위치정보 이용약관</a></li>
+			</ul>
+			<div class="btn-group">
+				<a href="" class="btn btn--gold">회사 소개</a> <a href=""
+					class="btn btn--gold">신규입점제의</a> <a href="" class="btn btn--gold">사이트
+					맵</a>
+			</div>
+		</div>
+	</footer>
+</body>
+</html>
+```
+글쓰기 버튼을 클릭했을때 나오는 글쓰기 화면 regist.jsp
+---
+```
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<link rel="icon" href="./assets/images/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+<!-- Latest compiled and minified CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+<!-- Latest compiled JavaScript -->
+<script defer
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<link
+	href="
+https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css
+"
+	rel="stylesheet" />
+<link rel="stylesheet" href="./assets/css/main.css" />
+<link rel="stylesheet" href="./assets/css/board.css">
+<script defer src="./assets/js/main.js"></script>
+</head>
+<body>
+
+
+	<!-- 헤더 -->
+
+	<%@ include file="/include/header.jsp"%>
+	<!-- 상단 navbar end -->
+
+	<section class="board">
+		<div class="page-title">
+			<div class="container d-flex justify-content-center flex row">
+				<h3>글 쓰기</h3><br>
+				
+				<div class="col-lg-8 col-md-10 col-sm-12 " >
+					<form id="form-register" method="POST" action="">
+						<input type="hidden" name="action" value="write">
+						<div class="mb-3">
+							<label for="subject" class="form-label">제목 : </label> <input
+								type="text" class="form-control" id="subject" name="subject"
+								placeholder="제목..." />
+						</div>
+						<div class="mb-3">
+							<label for="content" class="form-label">내용 : </label>
+							<textarea class="form-control" id="content" name="content"
+								rows="7"></textarea>
+						</div>
+						<div class="col-auto text-center">
+							<button type="button" id="btn-register"
+								class="btn btn-outline-primary mb-3">글작성</button>
+							<button type="reset" class="btn btn-outline-danger mb-3">초기화</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+		</div>
+
+
+
+	</section>
+	<script>
+	 document.querySelector("#btn-register").addEventListener("click", function () {
+	        if (!document.querySelector("#subject").value) {
+	          alert("제목 입력!!");
+	          return;
+	        } else if (!document.querySelector("#content").value) {
+	          alert("내용 입력!!");
+	          return;
+	        } else {
+	          let form = document.querySelector("#form-register");
+	          form.setAttribute("action", "${pageContext.request.contextPath}/board?action=regist&userId=${sessionScope.memberInfo.userId }");
+	          form.submit();
+	        }
+	      });</script>
+
+	<%@ include file="/include/footer.jsp"%>
+
+```
+글 수정버튼을 클릭시 나오는 글 수정화면 modify.jsp
+---
+```
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<link rel="icon" href="./assets/images/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+<!-- Latest compiled and minified CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+<!-- Latest compiled JavaScript -->
+<script defer
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<link
+	href="
+https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css
+"
+	rel="stylesheet" />
+<link rel="stylesheet" href="./assets/css/main.css" />
+<link rel="stylesheet" href="./assets/css/board.css">
+<script defer src="./assets/js/main.js"></script>
+</head>
+<body>
+
+
+	<!-- 헤더 -->
+
+	<%@ include file="/include/header.jsp"%>
+	<!-- 상단 navbar end -->
+
+	<section class="board">
+		<div class="page-title">
+			<div class="container d-flex justify-content-center flex row">
+				<h3>글 수정</h3><br>
+				
+				<div class="col-lg-8 col-md-10 col-sm-12 " >
+					<form id="form-register" method="POST" action="">
+						<input type="hidden" name="action" value="write">
+						<div class="mb-3">
+							<label for="subject" class="form-label">제목 : </label> <input
+								type="text" class="form-control" id="subject" name="subject"
+								value="${article.subject }" />
+						</div>
+						<div class="mb-3">
+							<label for="content" class="form-label">내용 : </label>
+							<textarea class="form-control" id="content" name="content"
+								rows="7" >${article.content }</textarea>
+						</div>
+						<div class="col-auto text-center">
+							<button type="button" id="btn-register"
+								class="btn btn-outline-primary mb-3">글 수정</button>
+							<button type="reset" class="btn btn-outline-danger mb-3">초기화</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+		</div>
+
+
+
+	</section>
+	<script>
+	 document.querySelector("#btn-register").addEventListener("click", function () {
+	        if (!document.querySelector("#subject").value) {
+	          alert("제목 입력!!");
+	          return;
+	        } else if (!document.querySelector("#content").value) {
+	          alert("내용 입력!!");
+	          return;
+	        } else {
+	          let form = document.querySelector("#form-register");
+	          form.setAttribute("action", "${pageContext.request.contextPath}/board?action=modify&userId=${sessionScope.memberInfo.userId }");
+	          form.submit();
+	        }
+	      });</script>
+
+	<%@ include file="/include/footer.jsp"%>
+
+```
+
 </details>
     
 
