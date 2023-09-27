@@ -205,11 +205,10 @@
 		return "MemberDto [userId=" + userId + ", user_name=" + userName + ", userPassword=" + userPassword + "]";
 	}
     
-    ---
-    #dfdff
-    
-실질적인 로직처를 하는 Dao
-    
+   
+   
+   실질적인 로직처리를 하는 DAO
+   ---
     public class BoardDaoImpl implements BoardDao {
 	private DBUtil dbUtil=DBUtil.getInstance();
 	
@@ -344,6 +343,149 @@
 			dbUtil.close(conn,pstmt);
 		}	
 	}
+}
+
+Controller의 요청을 DAO으로 전달하는 Service
+---
+public class MemberServiceImpl implements MemberService {
+	private MemberDao memberDao=new MemberDaoImpl();
+	@Override
+	public MemberDto login(String userId, String userPassword) throws SQLException {
+		return memberDao.login(userId, userPassword);
+	}
+	@Override
+	public void join(MemberDto memberDto) throws SQLException {
+		memberDao.join(memberDto);
+		
+	}
+
+요청 처리 제어를 담당하는 Controller
+---
+@WebServlet("/member")
+public class MemberController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    private MemberService memberService=new MemberServiceImpl();
+  
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String action=request.getParameter("action");
+		
+		switch (action) {
+		case "mvlogin":
+			response.sendRedirect(request.getContextPath()+"/login.jsp");
+			break;
+		case "login":
+			login(request,response);
+			break;
+		case "mvjoin":
+			response.sendRedirect(request.getContextPath()+"/join.jsp");
+			break;
+		case "join":
+			join(request,response);
+			break;
+		case "logout":
+			logout(request,response);
+			break;
+
+		default:
+			break;
+		}
+		
+	}
+
+	
+	private void join(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		MemberDto memberDto=new MemberDto();
+		System.out.println("회원가입 시작");
+		String userId=request.getParameter("userId");
+		String userName=request.getParameter("userName");
+		String userPassword=request.getParameter("userPassword");
+		
+		memberDto.setUserId(userId);
+		memberDto.setUserName(userName);
+		memberDto.setUserPassword(userPassword);
+		
+		try {
+			memberService.join(memberDto);
+			System.out.println("회원가입 성공");
+			response.sendRedirect(request.getContextPath()+"/index.jsp");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+	}
+
+
+	private void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		System.out.println("로그아웃 시작");
+		HttpSession session=request.getSession();
+		session.invalidate();
+		response.sendRedirect(request.getContextPath()+"/index.jsp");
+	}
+
+
+	private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("로그인 시작");
+		String userId=request.getParameter("userId");
+		String userPassword=request.getParameter("userPassword");
+		
+		
+		try {
+			MemberDto memberInfo=memberService.login(userId, userPassword);
+			
+			
+			if(memberInfo!=null) {
+				System.out.println("로그인 성공 : "+ memberInfo);
+				HttpSession session=request.getSession();
+				session.setAttribute("memberInfo", memberInfo);
+				
+				//====================쿠키 설정=======================
+				String idsave = request.getParameter("saveid");
+				if("ok".equals(idsave)) { //아이디 저장을 체크 했다면.
+					Cookie cookie = new Cookie("ssafy_id", userId);
+					cookie.setPath(request.getContextPath());
+//					크롬의 경우 400일이 최대
+//					https://developer.chrome.com/blog/cookie-max-age-expires/
+					cookie.setMaxAge(60 * 60 * 24 * 365 * 40); //40년간 저장.
+					response.addCookie(cookie);
+				} else { //아이디 저장을 해제 했다면.
+					Cookie cookies[] = request.getCookies();
+					if(cookies != null) {
+						for(Cookie cookie : cookies) {
+							if("ssafy_id".equals(cookie.getName())) {
+								cookie.setMaxAge(0);
+								response.addCookie(cookie);
+								break;
+							}
+						}
+					}
+				}
+				//====================쿠키 설정=======================
+				
+				request.getRequestDispatcher("/index.jsp").forward(request, response);
+			}
+			else {
+				System.out.println("로그인 실패");
+				request.setAttribute("msg", "아이디 또는 비밀번호 확인 후 다시 로그인하세요.");
+				request.getRequestDispatcher("/login.jsp").forward(request, response);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+//			request.setAttribute("msg", "로그인 중 에러 발생!!!");
+//			return "/error/error.jsp";
+		}
+		
+		
+		
+	}
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");
+		doGet(request, response);
+	}
+
 }
 </details>
     
