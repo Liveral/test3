@@ -167,7 +167,7 @@
 
 ## 2.2. 💻 code
 
--<details>
+<details>
 <summary>코드 펼치기</summary>
 
   Memeber DB에 접근하기 위한 Dto
